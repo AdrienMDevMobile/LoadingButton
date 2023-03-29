@@ -2,8 +2,10 @@ package com.example.loadingbutton.ui.element.loadingButton
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -14,8 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun CheckMarker(
@@ -29,7 +31,7 @@ fun CheckMarker(
             .fillMaxHeight()
     ) {
         drawMyCircle(progress, color)
-        drawCheckSign(progress, color, top = 10f, bottom = size.height - 30)
+        drawCheckSign(progress, color) //top = 10f, bottom = size.height - 30
     }
 }
 
@@ -37,31 +39,45 @@ private fun DrawScope.drawCheckSign(
     progress: Float,
     color: Color,
     start: Float = 0f,
-    end: Float= size.width,
-    top: Float = 0f,
-    bottom: Float = size.height,
+    end: Float = size.width,
+    top: Float = size.height * 0.1f,
+    bottom: Float = size.height - size.height * 0.1f,
 ) {
+    val length = end - start
+    val height = bottom - top
+    val firstTriangleHorizontalOffSet = length * 0.15f
+    val firstTriangleVerticalOffSet = height * 0.1f
+    val secondTriangleOverTheTop = height * 0.2f
+    val barWidth = height * 0.05f
+    val secondTriangleHorizontalOffset = length / 2
+    val rectangleHorizontalOffset = length * 0.1f
+
+
     clipPath(
         Path().apply {
-            moveTo(start, top) // déplacez-vous vers le coin supérieur gauche
-            lineTo(end, top) // ligne vers le coin supérieur droit
-            lineTo(end / 2 - 15, bottom-10) // ligne vers le presque milieu du bas
+
+            moveTo(start, top -2) // déplacez-vous vers le coin supérieur gauche
+            lineTo(end, top -2) // ligne vers le coin supérieur droit
+            lineTo(
+                end / 2 - firstTriangleHorizontalOffSet,
+                bottom - firstTriangleVerticalOffSet
+            ) // ligne vers le presque milieu du bas
             close() // fermer la forme pour compléter le triangle
-            moveTo(start, top + 10f) //triangle gauche
-            lineTo(start, bottom)
-            lineTo(end / 2 - 25, bottom)
+            moveTo(start, top + secondTriangleOverTheTop) //triangle gauche
+            lineTo(start, bottom+2)
+            lineTo(end / 2 - firstTriangleHorizontalOffSet - barWidth, bottom+2)
             close()
-            moveTo(end, top)
+            moveTo(end, top + barWidth*2)
             lineTo(end, bottom)
-            lineTo(end / 2, bottom)
+            lineTo(end / 2 - barWidth*2, bottom+2)
             close()
         },
         ClipOp.Difference
     ) {
         drawRect(
             color,
-            Offset(start + 35f, top),
-            Size(((end - start) - 35) * progress, bottom-top)
+            Offset(start + rectangleHorizontalOffset, top),
+            Size(((end - start) - rectangleHorizontalOffset) * progress, bottom - top)
         )
     }
 }
@@ -85,5 +101,29 @@ private fun DrawScope.drawMyCircle(
         ClipOp.Difference
     ) {
         drawArc(color, 0.9f, sweep, true)
+    }
+}
+
+@Preview
+@Composable
+fun previewCheck() {
+    Surface(color = Color.Cyan, modifier = Modifier.size(50.dp)) {
+        CheckMarker(progress = 1f)
+    }
+}
+
+@Preview
+@Composable
+fun previewCheckBig() {
+    Surface(color = Color.Cyan, modifier = Modifier.size(150.dp)) {
+        CheckMarker(progress = 1f)
+    }
+}
+
+@Preview
+@Composable
+fun previewCheckHalf() {
+    Surface(color = Color.Cyan, modifier = Modifier.size(50.dp)) {
+        CheckMarker(progress = 0.5f)
     }
 }
