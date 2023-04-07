@@ -1,4 +1,4 @@
-package com.example.loadingbutton.ui
+package com.example.loadingbutton.ui.element.loadingButton
 
 import android.util.Log
 import androidx.lifecycle.LiveData
